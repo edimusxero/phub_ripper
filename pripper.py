@@ -49,12 +49,16 @@ def scrape_web(list_name, search_term, pages):
 
         found_links = soup.find_all("div", {"class":"thumbnail-info-wrapper clearfix"})
 
+        counter = 0
+        
         for current_link in found_links:
             for video_found in current_link.find_all('a', {"class":""}):
                 vids = video_found.get('href')
                 usable_url = re.match("\/view_video.*", vids)
                 if usable_url:
-                    print(domain + vids, file = full_list)
+                    counter += 1
+                    if counter > 4:
+                        print(domain + vids, file = full_list)
 
     full_list.close()
     response.close() 
