@@ -65,7 +65,8 @@ if not pages:
     pages = 1
 
 if not list_name:
-    list_name = 'list.txt'
+    file_name = search.replace(" ", "_")
+    list_name = file_name + '.txt'
     
 scrape_web(list_name, search, pages)
 
