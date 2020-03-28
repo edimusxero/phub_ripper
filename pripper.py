@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 
+from bs4 import BeautifulSoup
 import bs4 as bs
 import re, sys, os
 import argparse
 from urllib.request import Request, urlopen
+import requests
 
-# This is the https://www.pornhub.com portion
-domain = 'https://www.pornhub.com'
+session = requests.Session()
 
 def get_args():
     parser = argparse.ArgumentParser(description='Comic File Web Scrapper')
@@ -16,16 +17,19 @@ def get_args():
                         metavar='# of pages to scrape')
     parser.add_argument('-l', '--listname', type=str, required=False,
                         metavar='custom list name (defaults to list.txt)')
-                        
+    parser.add_argument('-x', '--premium', type=str, required=False,
+                        metavar='Use premium account, will require username and password in <username:password> format')
+
     args = parser.parse_args()
     search = args.search
     pages = args.pages
     list_name = args.listname
+    premium = args.premium
     
     if not search:
         parser.error('Search Term Needed')
         
-    return (search, pages, list_name)
+    return (search, pages, list_name, premium)
 
 def scrape_web(list_name, search_term, pages):
     if os.path.exists(list_name):
@@ -42,10 +46,9 @@ def scrape_web(list_name, search_term, pages):
     for current_page in page_range:
         url = sub_url + str(current_page)
 
-        req = Request(url, headers = {"User-Agent": "Mozilla/5.0"})
-        response = urlopen(req)
+        req = session.get(url)
 
-        soup = bs.BeautifulSoup(response,'lxml')
+        soup = BeautifulSoup(req.text, 'html.parser')
 
         found_links = soup.find_all("div", {"class":"thumbnail-info-wrapper clearfix"})
 
@@ -61,9 +64,30 @@ def scrape_web(list_name, search_term, pages):
                         print(domain + vids, file = full_list)
 
     full_list.close()
-    response.close() 
 
-search, pages, list_name = get_args()
+def premium_login(domain, username, password):
+    login = '/premium/login'
+    login_url = domain + login
+
+    s = session.get(login_url)
+    soup = BeautifulSoup(s.text, 'html.parser')
+    found_links = soup.find_all("div", {"class":"clearfix"})
+
+    for a in found_links:
+        for id in a.find_all('input', {"id":"token"}):
+            token = (id['value'])
+
+    payload = {'username':username, 
+            'password':password,
+            'token':token,
+            'redirect':'',
+            'from':'pc_premium_login',
+            'segment':'straight'
+            }
+
+    s = session.post(domain + '/front/authenticate', data=payload)
+
+search, pages, list_name, premium = get_args()
 
 if not pages:
     pages = 1
@@ -71,7 +95,12 @@ if not pages:
 if not list_name:
     file_name = search.replace(" ", "_")
     list_name = file_name + '.txt'
-    
-scrape_web(list_name, search, pages)
 
-
+if premium:
+    username, password = premium.split(':')
+    domain = 'https://www.pornhubpremium.com'
+    premium_login(domain, username, password)
+    scrape_web(list_name, search, pages)
+else:
+    domain = 'https://www.pornhub.com'
+    scrape_web(list_name, search, pages)
