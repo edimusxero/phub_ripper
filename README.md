@@ -15,6 +15,10 @@ Number of pages to scrape.  Not required, defaults to 1
 **-l / --list_name**
 
 Optional custom list name.  Defaults to list.txt
+
+**-x / --premium**
+
+Allows you to pass login credentials to scrape premium pages.  <username:password> format
     
     
 You can set a list name at the list_name variable.  All scraped urls are dumped into this file which can then be used with youtube-dl
