@@ -85,7 +85,25 @@ def premium_login(domain, username, password):
             'segment':'straight'
             }
 
-    s = session.post(domain + '/front/authenticate', data=payload)
+    try:
+        s = session.post(domain + '/front/authenticate', data=payload)
+    except Exception:
+        print("Failed to login")
+
+def user_logout(domain):
+    req = session.get(domain)
+
+    soup = BeautifulSoup(req.text, 'html.parser')
+
+    for found_links in soup.find_all("a", {"class":"js_premiumLogOut"}, href=True):
+        logout = found_links['href']
+
+    full_logout = domain + logout
+    
+    try:
+        response = session.get(full_logout)
+    except Exception:
+        print("Failed to process logout request")
 
 search, pages, list_name, premium = get_args()
 
@@ -101,6 +119,10 @@ if premium:
     domain = 'https://www.pornhubpremium.com'
     premium_login(domain, username, password)
     scrape_web(list_name, search, pages)
+    user_logout(domain)
+    session.close()
 else:
     domain = 'https://www.pornhub.com'
     scrape_web(list_name, search, pages)
+    session.close()
+
