@@ -20,7 +20,11 @@ Optional custom list name.  Defaults to list.txt
 
 Allows you to pass login credentials to scrape premium pages.  <username:password> format
     
-    
+**-v / --verbose**
+
+Just prints out the titles of what your scrapping to console output
+
+
 You can set a list name at the list_name variable.  All scraped urls are dumped into this file which can then be used with youtube-dl
 
 I use youtube-dl like so
