@@ -33,7 +33,7 @@ def get_args():
     return (search, pages, list_name, premium, verbose)
 
 
-def scrape_web(list_name, search_term, pages, verbose):
+def scrape_web(list_name, search_term, pages, *args):
     if os.path.exists(list_name):
         os.remove(list_name)
 
