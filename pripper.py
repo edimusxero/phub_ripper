@@ -25,6 +25,7 @@ def get_args():
     pages = args.pages
     list_name = args.listname
     premium = args.premium
+<<<<<<< HEAD
     verbose = args.verbose
 
     if not search:
@@ -34,6 +35,16 @@ def get_args():
 
 
 def scrape_web(list_name, search_term, pages, verbose):
+=======
+
+    if not search:
+        parser.error('Search Term Needed')
+
+    return (search, pages, list_name, premium)
+
+
+def scrape_web(list_name, search_term, pages):
+>>>>>>> e63e568e6f0e4f0bb6cf216a8fb185050d6b2cad
     if os.path.exists(list_name):
         os.remove(list_name)
 
@@ -59,8 +70,11 @@ def scrape_web(list_name, search_term, pages, verbose):
                 if usable_url:
                     counter += 1
                     if counter > 4:
+<<<<<<< HEAD
                         if verbose:
                             print(video_found.get('title'))
+=======
+>>>>>>> e63e568e6f0e4f0bb6cf216a8fb185050d6b2cad
                         print(domain + vids, file=full_list)
 
     full_list.close()
