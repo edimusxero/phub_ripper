@@ -34,13 +34,6 @@ def get_args():
 
 
 def scrape_web(list_name, search_term, pages, verbose):
-    if not search:
-        parser.error('Search Term Needed')
-
-    return (search, pages, list_name, premium)
-
-
-def scrape_web(list_name, search_term, pages):
     if os.path.exists(list_name):
         os.remove(list_name)
 
