@@ -1,7 +1,9 @@
 #!/usr/bin/python3
-
+import re
+import os
+import argparse
+import requests
 from bs4 import BeautifulSoup
-import re, sys, os, argparse, requests
 
 
 session = requests.Session()
@@ -16,9 +18,12 @@ def get_args():
     parser.add_argument('-l', '--listname', type=str, required=False,
                         metavar='custom list name (defaults to list.txt)')
     parser.add_argument('-x', '--premium', type=str, required=False,
-                        metavar='Use premium account, will require username and password in <username:password> format')
+                        metavar='Use premium account, will require \
+                                username and password \
+                                in <username:password> format')
     parser.add_argument('-v', '--verbose', action='store_true',
-                        help='Prints titles to console so you know what you\'re grabbing')
+                        help='Prints titles to \
+                                console so you know what you\'re grabbing')
 
     args = parser.parse_args()
     search = args.search
@@ -49,13 +54,14 @@ def scrape_web(list_name, search_term, pages, *args):
         url = sub_url + str(current_page)
         req = session.get(url)
         soup = BeautifulSoup(req.text, 'html.parser')
-        found_links = soup.find_all("div", {"class": "thumbnail-info-wrapper clearfix"})
+        found_links = soup.find_all(
+            "div", {"class": "thumbnail-info-wrapper clearfix"})
         counter = 0
 
         for current_link in found_links:
             for video_found in current_link.find_all('a', {"class": ""}):
                 vids = video_found.get('href')
-                usable_url = re.match("\/view_video.*", vids)
+                usable_url = re.match(r"\/view_video.*", vids)
                 if usable_url:
                     counter += 1
                     if counter > 4:
@@ -97,15 +103,17 @@ def user_logout(domain):
 
     soup = BeautifulSoup(req.text, 'html.parser')
 
-    for found_links in soup.find_all("a", {"class": "js_premiumLogOut"}, href=True):
+    for found_links in soup.find_all(
+            "a", {"class": "js_premiumLogOut"}, href=True):
         logout = found_links['href']
 
     full_logout = domain + logout
 
     try:
-        response = session.get(full_logout)
+        session.get(full_logout)
     except Exception:
         print("Failed to process logout request")
+
 
 search, pages, list_name, premium, verbose = get_args()
 
